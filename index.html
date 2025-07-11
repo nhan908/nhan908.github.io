@@ -134,7 +134,7 @@
                             </div>
                         </div>
 
-                        <div class="timeline-item mb-10 ml-8">
+                        <div class="timeline-item mb-10 ml-8 active">
                             <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🥾</span>
                              <div class="timeline-header cursor-pointer">
                                 <h3 class="text-lg font-semibold text-stone-800">2. The Hike: Woodland & Waterside</h3>
@@ -146,7 +146,7 @@
                             </div>
                         </div>
 
-                        <div class="timeline-item mb-10 ml-8">
+                        <div class="timeline-item mb-10 ml-8 active">
                            <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🍽️</span>
                              <div class="timeline-header cursor-pointer">
                                 <h3 class="text-lg font-semibold text-stone-800">3. Post-Hike Refreshments</h3>
@@ -157,7 +157,7 @@
                             </div>
                         </div>
                         
-                         <div class="timeline-item ml-8">
+                         <div class="timeline-item ml-8 active">
                            <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🛣️</span>
                              <div class="timeline-header cursor-pointer">
                                 <h3 class="text-lg font-semibold text-stone-800">4. Scenic Ride Home</h3>
@@ -410,33 +410,3 @@
     </script>
 </body>
 </html>
-
-{#INCLUDE=REGARDING.XML}
-
-    <para>
-    We write to advise you that the fixed rate period on your account has now expired.
-    </para>
-    
-    <para>
-    As a result, the interest charged will revert to a variable rate, which is currently {*@valueof($$irate)}%. This is calculated based on the current Bank of England base rate of {*@round(@mul(BRV2040,100),2)}% plus the agreed margin of {*@round(@mul(ACCT658,100),2)}%. Your new monthly payment will be {{ACCT557} with effect from {*@valueof(ACCT560,TD)}.
-    </para>
-
-    <para>
-    Where your payment is made by Direct Debit the amount collected will be adjusted automatically.  If you pay by other means, you will be required to make the adjustment. 
-    </para>
-
-    <para>
-    You may wish to consider contacting a qualified Financial Advisor who may be able to discuss the options available to you. Our Selina Mortgage Advice team can also provide information on our current products, however, please be aware they can only provide financial advice on Selina products. 
-    </para>
-
-    <para>
-    If you have any questions or queries, please get in touch with our team.
-    </para>
-
-{#INCLUDE=SIGNOFFV001.XML}
-
-  </letter>
-
-{#INCLUDE=FOOTV001.XML}
-
-</standard_letter>
