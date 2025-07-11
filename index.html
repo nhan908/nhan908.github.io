@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Itinerary: Hanningfield Reservoir Day Trip</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony -->
+    <!-- Application Structure Plan: The application is structured as a single-page dashboard with four main interactive sections accessible via tabs: 'Overview', 'The Plan', 'Refreshment Hub', and 'Checklist'. This task-oriented design transforms the static itinerary into a dynamic planning tool. The 'Overview' provides a high-level visual summary with a timeline chart. 'The Plan' offers a detailed, expandable vertical timeline for step-by-step guidance. 'Refreshment Hub' allows for easy comparison of food venues. 'Checklist' turns preparation notes into an interactive list. This structure was chosen to break down the information into logical, digestible, and interactive components, enhancing usability and making trip planning more engaging than a simple document. -->
+    <!-- Visualization & Content Choices: 
+        - Report Info: Full day schedule -> Goal: Inform/Change -> Viz/Presentation: Horizontal Bar Chart (Timeline) -> Interaction: Visual scanning of day's segments -> Justification: Provides an immediate, high-level understanding of how time is allocated throughout the day. -> Library/Method: Chart.js (Canvas).
+        - Report Info: Step-by-step itinerary -> Goal: Organize/Inform -> Viz/Presentation: Vertical collapsible timeline -> Interaction: Click to expand/collapse details for each step -> Justification: Keeps the interface clean and focused, allowing users to drill down into specifics without being overwhelmed. -> Library/Method: HTML/CSS/JS.
+        - Report Info: Food & Drink options -> Goal: Compare -> Viz/Presentation: Side-by-side content cards -> Interaction: Hover effects for visual feedback -> Justification: Facilitates easy comparison of key details (vibe, menu, location) for making a choice. -> Library/Method: HTML/CSS (Flexbox/Grid).
+        - Report Info: Things to Remember -> Goal: Organize/Inform -> Viz/Presentation: Interactive checklist -> Interaction: Clickable checkboxes -> Justification: Creates an engaging, satisfying way for the user to confirm they are prepared for the trip. -> Library/Method: HTML/CSS/JS.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F5F5F4; /* warm neutral */
+            color: #1C1917;
+        }
+        .tab-active {
+            background-color: #A3B18A; /* earthy green */
+            color: #ffffff;
+        }
+        .tab-inactive {
+            background-color: #E7E5E4;
+            color: #57534E;
+        }
+        .content-card {
+            background-color: #ffffff;
+            border: 1px solid #E7E5E4;
+            border-radius: 0.75rem;
+            transition: all 0.3s ease;
+        }
+        .content-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .timeline-item-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-in-out;
+        }
+        .timeline-item.active .timeline-item-content {
+            max-height: 500px;
+        }
+        .chart-container {
+            position: relative; 
+            width: 100%; 
+            max-width: 800px; 
+            margin-left: auto; 
+            margin-right: auto; 
+            height: 250px;
+            max-height: 300px;
+        }
+        @media (min-width: 768px) {
+            .chart-container {
+                height: 300px;
+                max-height: 400px;
+            }
+        }
+        .checklist-item input:checked + label span:first-child {
+            background-color: #4D7C0F; /* dark earthy green */
+            border-color: #4D7C0F;
+        }
+        .checklist-item input:checked + label span:last-child {
+            text-decoration: line-through;
+            color: #78716C;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <div class="container mx-auto p-4 md:p-8 max-w-7xl">
+        <header class="text-center mb-8 md:mb-12">
+            <h1 class="text-3xl md:text-5xl font-bold text-stone-800">Hanningfield Reservoir</h1>
+            <p class="text-lg md:text-xl text-stone-600 mt-2">Interactive Motorcycle Day Trip Itinerary</p>
+        </header>
+
+        <div id="tabs" class="mb-8">
+            <div class="flex flex-wrap justify-center gap-2 md:gap-4">
+                <button data-tab="overview" class="tab tab-active text-sm md:text-base font-medium py-2 px-4 rounded-full transition-colors duration-300">Overview</button>
+                <button data-tab="plan" class="tab tab-inactive text-sm md:text-base font-medium py-2 px-4 rounded-full transition-colors duration-300">The Plan</button>
+                <button data-tab="food" class="tab tab-inactive text-sm md:text-base font-medium py-2 px-4 rounded-full transition-colors duration-300">Refreshment Hub</button>
+                <button data-tab="checklist" class="tab tab-inactive text-sm md:text-base font-medium py-2 px-4 rounded-full transition-colors duration-300">Checklist</button>
+            </div>
+        </div>
+
+        <main>
+            <div id="overview-content" class="tab-content">
+                <div class="content-card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-stone-800">Trip at a Glance</h2>
+                    <p class="text-stone-600 mb-6">
+                        This section provides a high-level summary of your day trip. Below, you'll find the key timings and a visual timeline chart that illustrates how your day is structured, helping you understand the flow from start to finish.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                        <div class="bg-stone-100 p-4 rounded-lg text-center">
+                            <span class="block text-3xl font-bold text-stone-800">~7 hrs</span>
+                            <span class="text-stone-600">Total Duration</span>
+                        </div>
+                        <div class="bg-stone-100 p-4 rounded-lg text-center">
+                            <span class="block text-3xl font-bold text-stone-800">3 hrs</span>
+                            <span class="text-stone-600">Target Hike Time</span>
+                        </div>
+                    </div>
+                    <h3 class="text-xl font-bold mb-4 text-stone-800">Day's Schedule Visualized</h3>
+                    <div class="chart-container">
+                        <canvas id="timelineChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div id="plan-content" class="tab-content hidden">
+                 <div class="content-card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-stone-800">Detailed Itinerary</h2>
+                     <p class="text-stone-600 mb-6">
+                        Here is the complete, step-by-step plan for your day. Click on any item in the timeline below to expand it and view the full details for that part of your journey, from the morning ride to the scenic trip home.
+                    </p>
+                    <div class="relative border-l-2 border-stone-200 ml-4">
+                        
+                        <div class="timeline-item mb-10 ml-8 active">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🏍️</span>
+                            <div class="timeline-header cursor-pointer">
+                                <h3 class="text-lg font-semibold text-stone-800">1. Morning Ride & Arrival</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-stone-500">10:00 AM - 11:30 AM</time>
+                            </div>
+                            <div class="timeline-item-content py-2">
+                                <p class="text-base font-normal text-stone-600">Depart from Stepney Green and enjoy the ride through the Essex countryside. Park at the free main car park (CM11 1WT) and head to the Visitor Centre to get your bearings.</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item mb-10 ml-8">
+                            <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🥾</span>
+                             <div class="timeline-header cursor-pointer">
+                                <h3 class="text-lg font-semibold text-stone-800">2. The Hike: Woodland & Waterside</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-stone-500">11:30 AM - 2:30 PM</time>
+                            </div>
+                            <div class="timeline-item-content py-2 space-y-2">
+                                <p class="text-base font-normal text-stone-600">Begin by immersing yourself in Well Wood and Hawk's Wood. Continue towards the reservoir, visiting bird hides like Lyster Hide. Extend your walk on public footpaths around the reservoir for varied scenery before returning.</p>
+                                <p class="text-sm text-stone-500"><strong>Tip:</strong> Use a mapping app to create a loop back to the car park. Binoculars are highly recommended for birdwatching!</p>
+                            </div>
+                        </div>
+
+                        <div class="timeline-item mb-10 ml-8">
+                           <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🍽️</span>
+                             <div class="timeline-header cursor-pointer">
+                                <h3 class="text-lg font-semibold text-stone-800">3. Post-Hike Refreshments</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-stone-500">2:30 PM - 3:30 PM</time>
+                            </div>
+                           <div class="timeline-item-content py-2">
+                                <p class="text-base font-normal text-stone-600">Time to refuel! You can choose from the convenient Cafe on the Water, the Visitor Centre Cafe, or take a short ride to a traditional local pub like The Old Windmill or The Ship.</p>
+                            </div>
+                        </div>
+                        
+                         <div class="timeline-item ml-8">
+                           <span class="absolute flex items-center justify-center w-8 h-8 bg-stone-200 rounded-full -left-4 ring-4 ring-white">🛣️</span>
+                             <div class="timeline-header cursor-pointer">
+                                <h3 class="text-lg font-semibold text-stone-800">4. Scenic Ride Home</h3>
+                                <time class="block mb-2 text-sm font-normal leading-none text-stone-500">3:30 PM - 5:00 PM</time>
+                            </div>
+                           <div class="timeline-item-content py-2">
+                                <p class="text-base font-normal text-stone-600">Depart from Hanningfield Reservoir. Consider taking a different scenic route back to London to make the most of the Essex countryside before returning to Stepney Green.</p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div id="food-content" class="tab-content hidden">
+                <div class="content-card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-stone-800">Refreshment Hub</h2>
+                    <p class="text-stone-600 mb-6">
+                        After a good hike, you'll need a satisfying meal. Here are your options laid out side-by-side. Compare the vibe, menu highlights, and location of each place to decide where you'll stop for your post-hike break.
+                    </p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        
+                        <div class="flex flex-col bg-stone-50 p-6 rounded-lg border border-stone-200">
+                            <h3 class="text-xl font-semibold mb-2 text-stone-800">Cafe on the Water</h3>
+                            <p class="text-sm text-stone-500 mb-3 italic">Hanningfield Reservoir, CM11 1WT</p>
+                            <p class="text-stone-600 mb-4 flex-grow"><strong class="text-stone-700">Vibe:</strong> Lovely cafe with panoramic reservoir views. Perfect for a relaxing post-hike stop.</p>
+                            <div>
+                                <h4 class="font-semibold mb-2 text-stone-700">Menu Highlights:</h4>
+                                <ul class="list-disc list-inside text-stone-600 space-y-1">
+                                    <li>Full English Breakfast</li>
+                                    <li>Jacket Potatoes & Soups</li>
+                                    <li>Fish & Chips / Pies</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col bg-stone-50 p-6 rounded-lg border border-stone-200">
+                            <h3 class="text-xl font-semibold mb-2 text-stone-800">The Old Windmill</h3>
+                             <p class="text-sm text-stone-500 mb-3 italic">South Hanningfield, CM3 8HT</p>
+                            <p class="text-stone-600 mb-4 flex-grow"><strong class="text-stone-700">Vibe:</strong> Traditional, highly-rated country pub with a welcoming atmosphere.</p>
+                             <div>
+                                <h4 class="font-semibold mb-2 text-stone-700">Menu Highlights:</h4>
+                                <ul class="list-disc list-inside text-stone-600 space-y-1">
+                                    <li>Steak & Ale Pie</li>
+                                    <li>Classic Fish & Chips</li>
+                                    <li>Good selection of real ales</li>
+                                </ul>
+                            </div>
+                        </div>
+
+                        <div class="flex flex-col bg-stone-50 p-6 rounded-lg border border-stone-200">
+                             <h3 class="text-xl font-semibold mb-2 text-stone-800">The Ship</h3>
+                             <p class="text-sm text-stone-500 mb-3 italic">West Hanningfield, CM2 8LF</p>
+                             <p class="text-stone-600 mb-4 flex-grow"><strong class="text-stone-700">Vibe:</strong> Charming and historic pub known for friendly service and quality food.</p>
+                             <div>
+                                <h4 class="font-semibold mb-2 text-stone-700">Menu Highlights:</h4>
+                                <ul class="list-disc list-inside text-stone-600 space-y-1">
+                                    <li>Gammon Steak or Scampi</li>
+                                    <li>Specials Board</li>
+                                    <li>Well-stocked bar</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="checklist-content" class="tab-content hidden">
+                 <div class="content-card p-6 md:p-8">
+                    <h2 class="text-2xl font-bold mb-4 text-stone-800">Pre-Trip Checklist</h2>
+                     <p class="text-stone-600 mb-6">
+                        Before you head out, run through this final checklist to make sure you have everything you need for a safe and enjoyable day. Click the boxes to mark items as complete and ensure you're fully prepared.
+                    </p>
+                    <div class="space-y-4">
+                        <div class="checklist-item">
+                            <input id="item1" type="checkbox" class="hidden">
+                            <label for="item1" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Check weather forecast</span>
+                            </label>
+                        </div>
+                        <div class="checklist-item">
+                            <input id="item2" type="checkbox" class="hidden">
+                            <label for="item2" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Comfortable hiking boots/shoes</span>
+                            </label>
+                        </div>
+                         <div class="checklist-item">
+                            <input id="item3" type="checkbox" class="hidden">
+                            <label for="item3" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Dress in layers (inc. waterproofs)</span>
+                            </label>
+                        </div>
+                         <div class="checklist-item">
+                            <input id="item4" type="checkbox" class="hidden">
+                            <label for="item4" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Bring water & snacks</span>
+                            </label>
+                        </div>
+                         <div class="checklist-item">
+                            <input id="item5" type="checkbox" class="hidden">
+                            <label for="item5" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Binoculars for birdwatching</span>
+                            </label>
+                        </div>
+                         <div class="checklist-item">
+                            <input id="item6" type="checkbox" class="hidden">
+                            <label for="item6" class="flex items-center cursor-pointer text-stone-700">
+                                <span class="w-5 h-5 mr-3 border-2 border-stone-300 rounded-sm flex items-center justify-center transition-colors">
+                                    <span class="text-white text-xs">✔</span>
+                                </span>
+                                <span class="transition-colors">Phone/Camera (fully charged)</span>
+                            </label>
+                        </div>
+                        <div class="mt-6 p-4 bg-amber-50 border-l-4 border-amber-400 text-amber-800 rounded-r-lg">
+                            <p><strong>Important:</strong> Dogs are not permitted in the main Nature Reserve (assistance dogs excepted). Plan accordingly!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Tab switching logic
+            const tabs = document.querySelectorAll('.tab');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const target = tab.getAttribute('data-tab');
+
+                    tabs.forEach(t => {
+                        t.classList.remove('tab-active');
+                        t.classList.add('tab-inactive');
+                    });
+                    tab.classList.remove('tab-inactive');
+                    tab.classList.add('tab-active');
+
+                    tabContents.forEach(content => {
+                        if (content.id === `${target}-content`) {
+                            content.classList.remove('hidden');
+                        } else {
+                            content.classList.add('hidden');
+                        }
+                    });
+                });
+            });
+
+            // Timeline item accordion logic
+            const timelineItems = document.querySelectorAll('.timeline-item .timeline-header');
+            timelineItems.forEach(header => {
+                header.addEventListener('click', () => {
+                    header.parentElement.classList.toggle('active');
+                });
+            });
+
+
+            // Chart.js Timeline Chart
+            const ctx = document.getElementById('timelineChart').getContext('2d');
+            const timelineChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Ride', 'Hike', 'Refresh', 'Ride Home'],
+                    datasets: [{
+                        label: 'Time Allocation (Hours)',
+                        data: [
+                            { x: [10, 11.5], y: 'Ride' },
+                            { x: [11.5, 14.5], y: 'Hike' },
+                            { x: [14.5, 15.5], y: 'Refresh' },
+                            { x: [15.5, 17], y: 'Ride Home' }
+                        ],
+                        backgroundColor: [
+                            'rgba(163, 177, 138, 0.7)', // #A3B18A
+                            'rgba(77, 124, 15, 0.7)',    // #4D7C0F
+                            'rgba(59, 130, 246, 0.7)',   // #3B82F6
+                            'rgba(163, 177, 138, 0.7)'  // #A3B18A
+                        ],
+                        borderColor: [
+                             'rgba(163, 177, 138, 1)',
+                            'rgba(77, 124, 15, 1)',
+                            'rgba(59, 130, 246, 1)',
+                            'rgba(163, 177, 138, 1)'
+                        ],
+                        borderWidth: 1,
+                        barPercentage: 0.6,
+                        categoryPercentage: 0.8
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            min: 10,
+                            max: 17,
+                            title: {
+                                display: true,
+                                text: 'Time of Day (24hr)'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        y: {
+                           grid: {
+                                display: false
+                           }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const item = context.raw;
+                                    const duration = item.x[1] - item.x[0];
+                                    const hours = Math.floor(duration);
+                                    const minutes = (duration - hours) * 60;
+                                    let durationStr = '';
+                                    if(hours > 0) durationStr += `${hours} hr `;
+                                    if(minutes > 0) durationStr += `${minutes} min`;
+                                    
+                                    return `${context.dataset.label}: ${durationStr.trim()}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+</html>
+
+{#INCLUDE=REGARDING.XML}
+
+    <para>
+    We write to advise you that the fixed rate period on your account has now expired.
+    </para>
+    
+    <para>
+    As a result, the interest charged will revert to a variable rate, which is currently {*@valueof($$irate)}%. This is calculated based on the current Bank of England base rate of {*@round(@mul(BRV2040,100),2)}% plus the agreed margin of {*@round(@mul(ACCT658,100),2)}%. Your new monthly payment will be {{ACCT557} with effect from {*@valueof(ACCT560,TD)}.
+    </para>
+
+    <para>
+    Where your payment is made by Direct Debit the amount collected will be adjusted automatically.  If you pay by other means, you will be required to make the adjustment. 
+    </para>
+
+    <para>
+    You may wish to consider contacting a qualified Financial Advisor who may be able to discuss the options available to you. Our Selina Mortgage Advice team can also provide information on our current products, however, please be aware they can only provide financial advice on Selina products. 
+    </para>
+
+    <para>
+    If you have any questions or queries, please get in touch with our team.
+    </para>
+
+{#INCLUDE=SIGNOFFV001.XML}
+
+  </letter>
+
+{#INCLUDE=FOOTV001.XML}
+
+</standard_letter>
