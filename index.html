@@ -1,367 +1,472 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monopoly Banker & Rent</title>
-    <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #27ae60;
-            --danger: #c0392b;
-            --light: #f4f6f7;
-            --dark: #2c3e50;
-        }
-        * { box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
-        body { margin: 0; padding: 0; background-color: #eef2f5; color: var(--dark); }
-
-        .container { max-width: 600px; margin: 0 auto; padding: 15px; padding-bottom: 80px; }
-
-        /* Header & Sticky Actions */
-        header { 
-            text-align: center; margin-bottom: 20px; 
-            padding-bottom: 10px; border-bottom: 2px solid #ddd;
-        }
-        
-        /* Floating Action Button for Rent */
-        .fab-container {
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            display: flex; gap: 10px; z-index: 99;
-            width: 90%; max-width: 580px;
-        }
-        .btn-large-action {
-            flex: 1; padding: 15px; border: none; border-radius: 50px;
-            font-size: 1.1rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-            transition: transform 0.1s;
-        }
-        .btn-rent { background-color: var(--primary); color: white; }
-        .btn-rent:active { transform: translateX(-50%) scale(0.95); }
-
-        /* Setup Area */
-        .setup-box { background: white; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 10px; }
-        input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ccc; border-radius: 5px; }
-
-        /* Player List (Accordion) */
-        .player-list { display: flex; flex-direction: column; gap: 10px; }
-        
-        .player-row {
-            background: white; border-radius: 8px; overflow: hidden;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-        }
-
-        .player-summary {
-            padding: 15px; display: flex; justify-content: space-between; align-items: center;
-            cursor: pointer; background: white; user-select: none;
-        }
-        .player-summary:hover { background-color: #fafafa; }
-        
-        .p-name { font-weight: 700; font-size: 1.1rem; }
-        .p-money { font-weight: 800; font-size: 1.2rem; color: var(--accent); }
-        .chevron { transition: transform 0.2s; color: #999; }
-        .expanded .chevron { transform: rotate(180deg); }
-
-        /* Expanded Details */
-        .player-details {
-            display: none; padding: 15px; background-color: #f8f9fa; border-top: 1px solid #eee;
-        }
-        .expanded .player-details { display: block; animation: slideDown 0.2s ease-out; }
-
-        @keyframes slideDown {
-            from { opacity: 0; transform: translateY(-5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Controls inside accordion */
-        .control-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
-        .btn { padding: 10px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; }
-        .btn-go { background: #d5f5e3; color: #1e8449; grid-column: span 2; }
-        .btn-jail { background: #fadbd8; color: #922b21; }
-        .btn-prop { background: #d6eaf8; color: #21618c; grid-column: span 2; }
-        .btn-custom { background: #eaecee; color: #333; grid-column: span 2; }
-
-        /* Property Chips */
-        .prop-list { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 10px; }
-        .prop-chip { 
-            font-size: 0.75rem; color: white; padding: 4px 8px; border-radius: 4px; 
-            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
-        }
-
-        /* Modals */
-        .modal-overlay {
-            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: flex-end;
-        }
-        .modal-content {
-            background: white; width: 100%; max-width: 600px; 
-            border-radius: 15px 15px 0 0; padding: 20px;
-            animation: slideUp 0.3s;
-        }
-        @keyframes slideUp { from {transform: translateY(100%);} to {transform: translateY(0);} }
-
-        .transfer-grid {
-            display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: center; margin: 20px 0;
-        }
-        select, input[type="number"] { width: 100%; padding: 12px; border-radius: 5px; border: 1px solid #ccc; font-size: 1rem; }
-        .arrow-icon { font-size: 1.5rem; color: #777; text-align: center; }
-
-        .hidden { display: none; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nattura Shoot Production Sheet</title>
+  <meta
+    name="description"
+    content="A premium production microsite for the Nattura shoot plan, including teams, talent, crew, deliverables, schedule, and coverage notes."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600&family=Sora:wght@300;400;500;600;700&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+  <div class="page-shell">
+    <header class="hero">
+      <nav class="topbar" aria-label="Primary">
+        <div class="brand-mark">
+          <span class="brand-kicker">Shoot Day</span>
+          <span class="brand-name">Nattura</span>
+        </div>
+        <div class="topbar-links">
+          <a href="#deliverables">Deliverables</a>
+          <a href="#schedule">Schedule</a>
+          <a href="#crew">Crew</a>
+          <a href="#notes">Notes</a>
+        </div>
+      </nav>
 
-<div class="container">
-    <header>
-        <h2>🏦 Monopoly Ledger</h2>
+      <div class="hero-grid">
+        <div class="hero-copy">
+          <p class="eyebrow">Production Sheet</p>
+          <h1>Consumer polish, production clarity, and a fast-moving half-day schedule.</h1>
+          <p class="hero-text">
+            A premium microsite for the Saturday shoot: two concurrent units, four models,
+            three interchangeable crew, and eight social-first hero outputs adapted from the
+            concept tabs.
+          </p>
+
+          <div class="hero-pills" role="list" aria-label="Shoot summary">
+            <span role="listitem">9:30 AM to 1:00 PM</span>
+            <span role="listitem">2 Concurrent Teams</span>
+            <span role="listitem">4 Models</span>
+            <span role="listitem">3 Crew</span>
+            <span role="listitem">8 Hero Concepts</span>
+          </div>
+        </div>
+
+        <aside class="hero-panel">
+          <p class="panel-kicker">North Star</p>
+          <h2>Premium oral care, but social-native.</h2>
+          <p>
+            The visual lane is soft luxury, tactile product handling, clean beauty framing,
+            and fast edits that still feel intentional. Team A leans ritual and lifestyle.
+            Team B leans reaction, travel, and movement.
+          </p>
+
+          <div class="stat-grid">
+            <article>
+              <span class="stat-label">Lead Mood</span>
+              <strong>Warm, glossy, elevated</strong>
+            </article>
+            <article>
+              <span class="stat-label">Priority</span>
+              <strong>Get the hero open and the hero close</strong>
+            </article>
+            <article>
+              <span class="stat-label">Backup Plan</span>
+              <strong>Convert remaining time into pickups</strong>
+            </article>
+            <article>
+              <span class="stat-label">Coverage Style</span>
+              <strong>Beauty + social-native hybrid</strong>
+            </article>
+          </div>
+        </aside>
+      </div>
     </header>
 
-    <div id="setup-area" class="setup-box">
-        <input type="text" id="new-name" placeholder="Enter Player Name">
-        <button class="btn btn-prop" style="width: auto; padding: 0 20px;" onclick="addPlayer()">Add</button>
-    </div>
-    
-    <div id="start-btn-container" style="text-align: center; margin-bottom: 20px;">
-        <button class="btn btn-go" onclick="startGame()">Begin Game</button>
-    </div>
+    <main>
+      <section class="section intro-strip" id="overview">
+        <article class="overview-card">
+          <span class="overview-label">Shoot Window</span>
+          <strong>9:30 AM to 1:00 PM</strong>
+          <p>Short-form capture designed for speed, clean resets, and edit flexibility.</p>
+        </article>
+        <article class="overview-card">
+          <span class="overview-label">Talent</span>
+          <strong>Solenne, Rhea, Becky, Ben</strong>
+          <p>Four models across solo, paired, and group-led content lanes.</p>
+        </article>
+        <article class="overview-card">
+          <span class="overview-label">Crew</span>
+          <strong>Nick, Amul, Andrew</strong>
+          <p>All interchangeable across setup, runner support, photography, and videography.</p>
+        </article>
+        <article class="overview-card">
+          <span class="overview-label">Structure</span>
+          <strong>Team A + Team B</strong>
+          <p>One beauty/lifestyle unit and one reaction/travel unit running in parallel.</p>
+        </article>
+      </section>
 
-    <div id="player-list" class="player-list"></div>
-
-    <div id="game-controls" class="fab-container hidden">
-        <button class="btn-large-action btn-rent" onclick="openTransferModal()">💸 Pay Rent / Transfer</button>
-    </div>
-</div>
-
-<div id="transfer-modal" class="modal-overlay" onclick="if(event.target === this) closeTransferModal()">
-    <div class="modal-content">
-        <h3>💸 Settle Rent / Transfer</h3>
-        
-        <div class="transfer-grid">
-            <div>
-                <label style="font-size:0.8rem; color:#666;">PAYER</label>
-                <select id="t-payer"></select>
-            </div>
-            <div class="arrow-icon">➔</div>
-            <div>
-                <label style="font-size:0.8rem; color:#666;">RECIPIENT</label>
-                <select id="t-recipient"></select>
-            </div>
+      <section class="section" id="deliverables">
+        <div class="section-heading">
+          <p class="eyebrow">Hero Deliverables</p>
+          <h2>Eight core outputs grounded in the document tabs.</h2>
+          <p>
+            These are the strongest concepts to prioritize in the available window. Each is
+            assigned to the models who best fit its tone and visual grammar.
+          </p>
         </div>
 
-        <div style="margin-bottom: 20px;">
-            <label style="font-size:0.8rem; color:#666;">AMOUNT (£)</label>
-            <input type="number" id="t-amount" placeholder="e.g. 50">
+        <div class="deliverable-grid">
+          <article class="deliverable-card">
+            <span class="deliverable-number">01</span>
+            <h3>Morning ritual, premium version</h3>
+            <p>Golden-hour bathroom energy, mirror framing, quiet luxury routine beats.</p>
+            <div class="tag-row">
+              <span>Solenne</span>
+              <span>Hero Solo</span>
+              <span>Team A</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">02</span>
+            <h3>First time trying the tablet</h3>
+            <p>Tactile reaction, opening packaging, product-in-hand honesty, micro-expression focus.</p>
+            <div class="tag-row">
+              <span>Rhea</span>
+              <span>Hero Solo</span>
+              <span>Team B</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">03</span>
+            <h3>Skincare for your teeth</h3>
+            <p>Shelfie aesthetics, glossy props, mirror language, premium self-care storytelling.</p>
+            <div class="tag-row">
+              <span>Becky</span>
+              <span>Hero Solo</span>
+              <span>Team A</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">04</span>
+            <h3>Travel / bag reveal</h3>
+            <p>Wash bag, suitcase, movement, portability, and the easy premium swap story.</p>
+            <div class="tag-row">
+              <span>Ben</span>
+              <span>Hero Solo</span>
+              <span>Team B</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">05</span>
+            <h3>You dropped this</h3>
+            <p>Playful hand-off, flirt energy, social-native pacing, direct and memorable opening beat.</p>
+            <div class="tag-row">
+              <span>Rhea + Ben</span>
+              <span>Paired</span>
+              <span>Team B</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">06</span>
+            <h3>Aesthetic shots / premium lifestyle</h3>
+            <p>Soft objects, elegant background styling, composed movement, and beauty-led product framing.</p>
+            <div class="tag-row">
+              <span>Solenne + Becky</span>
+              <span>Paired</span>
+              <span>Team A</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">07</span>
+            <h3>What do people get wrong?</h3>
+            <p>Adapted into a quick-cut myth-busting social hook with sharp captions and clean transitions.</p>
+            <div class="tag-row">
+              <span>Solenne + Rhea + Becky</span>
+              <span>Group Variant</span>
+              <span>Team A</span>
+            </div>
+          </article>
+
+          <article class="deliverable-card">
+            <span class="deliverable-number">08</span>
+            <h3>One question, multiple points of view</h3>
+            <p>Editorial group piece with alternate angles, premium lighting, and a clean collective close.</p>
+            <div class="tag-row">
+              <span>All Four</span>
+              <span>Group Hero</span>
+              <span>Both Teams</span>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section" id="schedule">
+        <div class="section-heading">
+          <p class="eyebrow">Shoot Schedule</p>
+          <h2>Two units, one rhythm, no dead air.</h2>
+          <p>
+            The plan below keeps a camera live at nearly all times while the floating crew
+            member handles setup, product continuity, props, resets, and talent readiness.
+          </p>
         </div>
 
-        <button class="btn btn-go" style="width: 100%; font-size: 1.1rem;" onclick="executeTransfer()">Confirm Transfer</button>
-        <button class="btn btn-custom" style="width: 100%; margin-top: 10px;" onclick="closeTransferModal()">Cancel</button>
-    </div>
-</div>
+        <div class="schedule-grid">
+          <article class="time-block">
+            <div class="time-label">9:30-9:45</div>
+            <div class="time-body">
+              <div>
+                <h3>Global Call + Readiness</h3>
+                <p>All talent arrive. HMU, wardrobe, set dressing, final product prep.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> lighting and camera lock for Solenne</li>
+                <li><strong>Team B:</strong> lighting and camera lock for Rhea</li>
+                <li><strong>Crew Focus:</strong> Andrew floats on continuity, props, and readying next looks</li>
+              </ul>
+            </div>
+          </article>
 
-<div id="prop-modal" class="modal-overlay" onclick="if(event.target === this) document.getElementById('prop-modal').style.display='none'">
-    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
-        <h3>Manage Properties</h3>
-        <div id="prop-list-container"></div>
-        <button class="btn btn-custom" style="width: 100%; margin-top: 10px;" onclick="document.getElementById('prop-modal').style.display='none'">Close</button>
-    </div>
-</div>
+          <article class="time-block">
+            <div class="time-label">9:45-10:20</div>
+            <div class="time-body">
+              <div>
+                <h3>First Hero Wave</h3>
+                <p>Lock the strongest solo concepts first while energy and skin are freshest.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Solenne, <em>Morning ritual, premium version</em></li>
+                <li><strong>Team B:</strong> Rhea, <em>First time trying the tablet</em></li>
+                <li><strong>Crew Focus:</strong> Nick leads Team A, Amul leads Team B, Andrew captures inserts and resets</li>
+              </ul>
+            </div>
+          </article>
 
-<script>
-    // --- STATE ---
-    let players = [];
-    let gameActive = false;
-    let editingPlayerId = null;
+          <article class="time-block">
+            <div class="time-label">10:20-10:30</div>
+            <div class="time-body">
+              <div>
+                <h3>Micro Pickup Window</h3>
+                <p>Secure the detail shots before switching talent.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Solenne mirror, smile, tablet-in-palm, cover frame</li>
+                <li><strong>Team B:</strong> Rhea packaging, reaction close-up, hands, second opening beat</li>
+                <li><strong>Crew Focus:</strong> full reset into Becky and Ben setups</li>
+              </ul>
+            </div>
+          </article>
 
-    // Standard UK Properties
-    const properties = [
-        {name:"Old Kent Rd",c:"#8B4513",p:60},{name:"Whitechapel",c:"#8B4513",p:60},
-        {name:"Kings Cross",c:"#000000",p:200},{name:"The Angel",c:"#87CEEB",p:100},{name:"Euston Rd",c:"#87CEEB",p:100},{name:"Pentonville",c:"#87CEEB",p:120},
-        {name:"Pall Mall",c:"#C71585",p:140},{name:"Electric Co",c:"#777",p:150},{name:"Whitehall",c:"#C71585",p:140},{name:"Northumrlnd",c:"#C71585",p:160},
-        {name:"Marylebone",c:"#000000",p:200},{name:"Bow St",c:"#FFA500",p:180},{name:"Marlborough",c:"#FFA500",p:180},{name:"Vine St",c:"#FFA500",p:200},
-        {name:"Strand",c:"#FF0000",p:220},{name:"Fleet St",c:"#FF0000",p:220},{name:"Trafalgar Sq",c:"#FF0000",p:240},
-        {name:"Fenchurch",c:"#000000",p:200},{name:"Leicester Sq",c:"#FFFF00",p:260},{name:"Coventry St",c:"#FFFF00",p:260},
-        {name:"Water Works",c:"#777",p:150},{name:"Piccadilly",c:"#FFFF00",p:280},
-        {name:"Regent St",c:"#008000",p:300},{name:"Oxford St",c:"#008000",p:300},{name:"Bond St",c:"#008000",p:320},
-        {name:"Liverpool St",c:"#000000",p:200},{name:"Park Lane",c:"#00008B",p:350},{name:"Mayfair",c:"#00008B",p:400}
-    ].map((p,i)=>({...p, id:i, owner:null}));
+          <article class="time-block">
+            <div class="time-label">10:30-11:05</div>
+            <div class="time-body">
+              <div>
+                <h3>Second Hero Wave</h3>
+                <p>Shift into polished lifestyle and portable-use storytelling.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Becky, <em>Skincare for your teeth</em></li>
+                <li><strong>Team B:</strong> Ben, <em>Travel / bag reveal</em></li>
+                <li><strong>Crew Focus:</strong> Andrew handles bag props, shelf styling, and wardrobe corrections</li>
+              </ul>
+            </div>
+          </article>
 
-    // --- SETUP FUNCTIONS ---
-    function addPlayer() {
-        const input = document.getElementById('new-name');
-        const name = input.value.trim();
-        if(!name) return;
-        players.push({ id: Date.now(), name: name, money: 1500 });
-        input.value = '';
-        renderPlayers();
-    }
+          <article class="time-block">
+            <div class="time-label">11:05-11:15</div>
+            <div class="time-body">
+              <div>
+                <h3>Reset + Precision Pickups</h3>
+                <p>Grab the missing beauty and travel details before pair scenes begin.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Becky shelfie, mirror, product hold, alt close</li>
+                <li><strong>Team B:</strong> Ben suitcase, wash-bag reveal, walk-in, hand reveal</li>
+                <li><strong>Crew Focus:</strong> stage paired scenes and confirm product continuity</li>
+              </ul>
+            </div>
+          </article>
 
-    function startGame() {
-        if(players.length < 2) return alert("Need at least 2 players!");
-        gameActive = true;
-        document.getElementById('setup-area').classList.add('hidden');
-        document.getElementById('start-btn-container').classList.add('hidden');
-        document.getElementById('game-controls').classList.remove('hidden');
-        renderPlayers();
-    }
+          <article class="time-block">
+            <div class="time-label">11:15-11:45</div>
+            <div class="time-body">
+              <div>
+                <h3>Pair Scene Run</h3>
+                <p>Use chemistry and contrast to widen the edit options.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Solenne + Becky, <em>Aesthetic shots / premium lifestyle</em></li>
+                <li><strong>Team B:</strong> Rhea + Ben, <em>You dropped this</em></li>
+                <li><strong>Crew Focus:</strong> Andrew floats, preps next group setup, and captures BTS stills</li>
+              </ul>
+            </div>
+          </article>
 
-    // --- RENDER LOGIC ---
-    function renderPlayers() {
-        const list = document.getElementById('player-list');
-        list.innerHTML = '';
+          <article class="time-block">
+            <div class="time-label">11:45-12:15</div>
+            <div class="time-body">
+              <div>
+                <h3>Social Hook Variants</h3>
+                <p>Turn the strongest concepts into fast-cut alternate versions.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> Solenne + Rhea + Becky, <em>What do people get wrong?</em></li>
+                <li><strong>Team B:</strong> Ben plus mixed-pair alternates for social-native backup coverage</li>
+                <li><strong>Crew Focus:</strong> whichever lead is ahead supports the slower unit</li>
+              </ul>
+            </div>
+          </article>
 
-        players.forEach(p => {
-            const row = document.createElement('div');
-            row.className = `player-row ${p.id === editingPlayerId ? 'expanded' : ''}`;
-            
-            // Get properties
-            const myProps = properties.filter(prop => prop.owner === p.id);
-            const propHtml = myProps.map(x => 
-                `<span class="prop-chip" style="background:${x.c}">${x.name}</span>`
-            ).join('');
+          <article class="time-block">
+            <div class="time-label">12:15-12:40</div>
+            <div class="time-body">
+              <div>
+                <h3>Group Hero + Alternate Angles</h3>
+                <p>Bring all four models together while both units are active.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> main group hero, <em>One question, multiple points of view</em></li>
+                <li><strong>Team B:</strong> alternate angles, handheld movement, BTS, stills</li>
+                <li><strong>Crew Focus:</strong> one lead camera, one support camera, one swing operator</li>
+              </ul>
+            </div>
+          </article>
 
-            row.innerHTML = `
-                <div class="player-summary" onclick="togglePlayer(${p.id})">
-                    <span class="p-name">${p.name}</span>
-                    <div style="display:flex; align-items:center; gap:10px;">
-                        <span class="p-money">£${p.money}</span>
-                        <span class="chevron">▼</span>
-                    </div>
-                </div>
-                <div class="player-details">
-                    <div class="control-group">
-                        <button class="btn btn-go" onclick="updateMoney(${p.id}, 200)">Pass Go (+£200)</button>
-                        <button class="btn btn-jail" onclick="updateMoney(${p.id}, -50)">Pay Jail / Tax (-£50)</button>
-                        <button class="btn btn-custom" onclick="customAmount(${p.id})">Manual Adjust (+/-)</button>
-                        <button class="btn btn-prop" onclick="openPropModal(${p.id})">Manage Properties</button>
-                    </div>
-                    <div style="border-top:1px solid #eee; padding-top:10px;">
-                        <small style="color:#777; font-weight:bold;">PROPERTIES:</small>
-                        <div class="prop-list">${propHtml || '<span style="color:#aaa; font-size:0.8rem">None</span>'}</div>
-                    </div>
-                </div>
-            `;
-            list.appendChild(row);
-        });
-    }
+          <article class="time-block">
+            <div class="time-label">12:40-1:00</div>
+            <div class="time-body">
+              <div>
+                <h3>Final Pickup Sweep</h3>
+                <p>Convert remaining minutes into the shots editors always wish they had.</p>
+              </div>
+              <ul>
+                <li><strong>Team A:</strong> smiles, mirror reflections, tablet macros, thumbnail poses</li>
+                <li><strong>Team B:</strong> tin opening, bag reveal, walking entries, candid reactions</li>
+                <li><strong>Crew Focus:</strong> prioritize missing coverage, then grab luxury product details</li>
+              </ul>
+            </div>
+          </article>
+        </div>
+      </section>
 
-    function togglePlayer(id) {
-        // Toggle collapse/expand
-        editingPlayerId = (editingPlayerId === id) ? null : id;
-        renderPlayers();
-    }
+      <section class="section" id="crew">
+        <div class="section-heading">
+          <p class="eyebrow">Talent &amp; Crew</p>
+          <h2>Clear default roles, flexible execution.</h2>
+          <p>
+            Everyone on crew is interchangeable, but setting default ownership reduces drag
+            and keeps the day moving.
+          </p>
+        </div>
 
-    // --- MONEY LOGIC ---
-    function updateMoney(pid, amt) {
-        players.find(p => p.id === pid).money += amt;
-        renderPlayers();
-    }
+        <div class="people-layout">
+          <div class="people-column">
+            <h3 class="column-title">Models</h3>
+            <div class="people-grid">
+              <article class="person-card">
+                <h4>Solenne</h4>
+                <p>Lead beauty energy. Best for ritual, elegance, mirror shots, and premium close-ups.</p>
+              </article>
+              <article class="person-card">
+                <h4>Rhea</h4>
+                <p>Strong for reaction-led content, tactile product moments, and social-native hooks.</p>
+              </article>
+              <article class="person-card">
+                <h4>Becky</h4>
+                <p>Best for self-care framing, shelfie aesthetics, mirror language, and soft-luxury styling.</p>
+              </article>
+              <article class="person-card">
+                <h4>Ben</h4>
+                <p>Best for movement, travel utility, mixed-pair chemistry, and easy conversational setups.</p>
+              </article>
+            </div>
+          </div>
 
-    function customAmount(pid) {
-        const amt = prompt("Amount to ADD (use - for sub):");
-        if(amt && !isNaN(amt)) updateMoney(pid, parseInt(amt));
-    }
+          <div class="people-column">
+            <h3 class="column-title">Crew</h3>
+            <div class="people-grid">
+              <article class="person-card crew-card">
+                <h4>Nick</h4>
+                <p>Default Team A lead. Owns polished hero framing, hero takes, and final thumbnail coverage.</p>
+              </article>
+              <article class="person-card crew-card">
+                <h4>Amul</h4>
+                <p>Default Team B lead. Owns movement, travel beats, reaction coverage, and fast alternates.</p>
+              </article>
+              <article class="person-card crew-card">
+                <h4>Andrew</h4>
+                <p>Swing operator. Handles setup, props, product continuity, runner tasks, BTS, and second-angle support.</p>
+              </article>
+              <article class="person-card crew-card accent-card">
+                <h4>Working Rule</h4>
+                <p>If one unit runs ahead, that lead immediately floats to the slower setup. Keep one person always free for reset.</p>
+              </article>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    // --- TRANSFER / RENT LOGIC ---
-    function openTransferModal() {
-        const pSelect = document.getElementById('t-payer');
-        const rSelect = document.getElementById('t-recipient');
-        pSelect.innerHTML = '';
-        rSelect.innerHTML = '';
+      <section class="section notes-section" id="notes">
+        <div class="section-heading">
+          <p class="eyebrow">Coverage Notes</p>
+          <h2>What must be captured, even if the clock tightens.</h2>
+          <p>
+            These are the shots that preserve edit flexibility and keep the final outputs feeling
+            complete rather than compromised.
+          </p>
+        </div>
 
-        players.forEach(p => {
-            pSelect.add(new Option(`${p.name} (£${p.money})`, p.id));
-            rSelect.add(new Option(p.name, p.id));
-        });
-        
-        // Add "Bank" as a recipient option
-        rSelect.add(new Option(" The Bank", "BANK"));
+        <div class="notes-grid">
+          <article class="notes-card">
+            <h3>Props &amp; Must-Haves</h3>
+            <div class="tag-row long-tags">
+              <span>Nattura tin</span>
+              <span>Tablets in palm</span>
+              <span>Open packaging</span>
+              <span>Wash bag</span>
+              <span>Suitcase</span>
+              <span>Mirror setup</span>
+              <span>Shelf styling</span>
+              <span>Clean end frame</span>
+            </div>
+          </article>
 
-        document.getElementById('t-amount').value = '';
-        document.getElementById('transfer-modal').style.display = 'flex';
-    }
+          <article class="notes-card">
+            <h3>Priority Order if Time Slips</h3>
+            <ol>
+              <li>Morning ritual, premium version</li>
+              <li>First time trying the tablet</li>
+              <li>Skincare for your teeth</li>
+              <li>Travel / bag reveal</li>
+              <li>You dropped this</li>
+              <li>Aesthetic lifestyle</li>
+              <li>Group hero</li>
+              <li>Social hook variants</li>
+            </ol>
+          </article>
 
-    function closeTransferModal() {
-        document.getElementById('transfer-modal').style.display = 'none';
-    }
-
-    function executeTransfer() {
-        const payerId = parseInt(document.getElementById('t-payer').value);
-        const recipientVal = document.getElementById('t-recipient').value;
-        const amount = parseInt(document.getElementById('t-amount').value);
-
-        if(!amount || amount <= 0) return alert("Enter valid amount");
-        if(payerId == recipientVal) return alert("Cannot pay yourself!");
-
-        // Deduct from Payer
-        const payer = players.find(p => p.id === payerId);
-        payer.money -= amount;
-
-        // Add to Recipient (if not Bank)
-        if(recipientVal !== "BANK") {
-            const recipient = players.find(p => p.id === parseInt(recipientVal));
-            recipient.money += amount;
-        }
-
-        closeTransferModal();
-        renderPlayers();
-    }
-
-    // --- PROPERTY MANAGER ---
-    function openPropModal(pid) {
-        const p = players.find(x => x.id === pid);
-        const container = document.getElementById('prop-list-container');
-        container.innerHTML = `<p>Assigning for: <b>${p.name}</b></p>`;
-
-        // Unowned
-        const unowned = properties.filter(x => x.owner === null);
-        
-        // Render
-        let html = '';
-        unowned.forEach(prop => {
-            html += `
-                <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;">
-                    <span style="border-left: 5px solid ${prop.c}; padding-left:10px;">${prop.name} (£${prop.p})</span>
-                    <button class="btn btn-go" style="padding:5px 10px; font-size:0.8rem;" onclick="buyProp(${pid}, ${prop.id})">Buy</button>
-                </div>
-            `;
-        });
-        
-        // My Properties (to sell)
-        const mine = properties.filter(x => x.owner === pid);
-        if(mine.length > 0) {
-            html += `<h4 style="margin-top:20px; color:#c0392b;">Sell / Return</h4>`;
-            mine.forEach(prop => {
-                html += `
-                    <div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid #eee; align-items:center;">
-                        <span style="border-left: 5px solid ${prop.c}; padding-left:10px;">${prop.name}</span>
-                        <button class="btn btn-jail" style="padding:5px 10px; font-size:0.8rem;" onclick="sellProp(${pid}, ${prop.id})">Return</button>
-                    </div>
-                `;
-            });
-        }
-
-        container.innerHTML += html;
-        document.getElementById('prop-modal').style.display = 'flex';
-    }
-
-    function buyProp(pid, propId) {
-        const prop = properties.find(x => x.id === propId);
-        if(confirm(`Buy ${prop.name} for £${prop.p}?`)) {
-            prop.owner = pid;
-            updateMoney(pid, -prop.p);
-            document.getElementById('prop-modal').style.display = 'none';
-        }
-    }
-
-    function sellProp(pid, propId) {
-        const prop = properties.find(x => x.id === propId);
-        const val = prop.p / 2;
-        if(confirm(`Return ${prop.name} to bank for £${val}?`)) {
-            prop.owner = null;
-            updateMoney(pid, val);
-            document.getElementById('prop-modal').style.display = 'none';
-        }
-    }
-
-</script>
+          <article class="notes-card">
+            <h3>Pickup Wishlist</h3>
+            <ul class="simple-list">
+              <li>clean alt takes of opening beats</li>
+              <li>tablet in hand macros</li>
+              <li>tin opening</li>
+              <li>mirror reflections</li>
+              <li>smile / teeth close-up</li>
+              <li>walking entrance</li>
+              <li>candid laughing</li>
+              <li>cover-image pose</li>
+            </ul>
+          </article>
+        </div>
+      </section>
+    </main>
+  </div>
 </body>
 </html>
