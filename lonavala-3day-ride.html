@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Lonavala 3-Day Ride | RE Himalayan</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0f13;
+    --surface: #16181f;
+    --surface2: #1e2029;
+    --border: #2a2d38;
+    --text: #e8eaf0;
+    --muted: #8b8fa8;
+    --day1: #4a9eff;
+    --day2: #ff8c42;
+    --day3: #4ecb71;
+    --arrival: #9b8fff;
+    --accent: #ff8c42;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ─── HERO ─── */
+  .hero {
+    background: linear-gradient(160deg, #0e0f13 0%, #1a1020 50%, #0e1318 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 52px 24px 40px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(255,140,66,0.12) 0%, transparent 65%);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: rgba(255,140,66,0.15);
+    border: 1px solid rgba(255,140,66,0.35);
+    color: var(--accent);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 14px;
+    border-radius: 20px;
+    margin-bottom: 18px;
+  }
+  .hero h1 {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(28px, 5vw, 46px);
+    font-weight: 700;
+    letter-spacing: -0.5px;
+    line-height: 1.15;
+    margin-bottom: 12px;
+  }
+  .hero h1 span { color: var(--accent); }
+  .hero p {
+    color: var(--muted);
+    font-size: 15px;
+    max-width: 540px;
+    margin: 0 auto 28px;
+  }
+  .stats-row {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 10px;
+    position: relative;
+  }
+  .stat-pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 20px;
+    font-size: 13px;
+  }
+  .stat-pill strong { display: block; font-size: 18px; font-weight: 700; color: var(--text); }
+  .stat-pill span { color: var(--muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.8px; }
+
+  /* ─── MAP ─── */
+  .map-section {
+    padding: 0;
+  }
+  .map-header {
+    padding: 28px 24px 16px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .map-header h2 { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .map-header p { color: var(--muted); font-size: 13px; }
+
+  .map-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 0 24px 16px;
+    max-width: 960px;
+    margin: 0 auto;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .legend-line {
+    width: 28px;
+    height: 3px;
+    border-radius: 2px;
+  }
+  .legend-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+
+  #map {
+    width: 100%;
+    height: 480px;
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ─── MAIN CONTENT ─── */
+  .content {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .section-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    margin: 44px 0 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-title span { color: var(--accent); }
+
+  /* ─── DAY CARDS ─── */
+  .day-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .day-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+  }
+  .day-badge {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .day0 .day-badge { background: rgba(155,143,255,0.15); color: var(--arrival); border: 1px solid rgba(155,143,255,0.3); }
+  .day1 .day-badge { background: rgba(74,158,255,0.15); color: var(--day1); border: 1px solid rgba(74,158,255,0.3); }
+  .day2 .day-badge { background: rgba(255,140,66,0.15); color: var(--day2); border: 1px solid rgba(255,140,66,0.3); }
+  .day3 .day-badge { background: rgba(78,203,113,0.15); color: var(--day3); border: 1px solid rgba(78,203,113,0.3); }
+
+  .day-header-text h3 { font-size: 16px; font-weight: 600; margin-bottom: 3px; }
+  .day-header-text p { font-size: 12px; color: var(--muted); }
+  .day-meta {
+    margin-left: auto;
+    text-align: right;
+    font-size: 12px;
+    color: var(--muted);
+    flex-shrink: 0;
+  }
+  .day-meta strong { display: block; font-size: 15px; color: var(--text); font-weight: 600; }
+
+  .day-body { padding: 0 24px 24px; border-top: 1px solid var(--border); }
+
+  /* ─── ROUTE STOPS ─── */
+  .route-stops {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 20px 0;
+  }
+  .stop {
+    display: flex;
+    gap: 16px;
+    position: relative;
+  }
+  .stop-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+    width: 32px;
+  }
+  .stop-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: var(--bg);
+    flex-shrink: 0;
+    margin-top: 4px;
+    position: relative;
+    z-index: 1;
+  }
+  .stop-line {
+    width: 2px;
+    flex: 1;
+    min-height: 24px;
+    margin: 2px 0;
+  }
+  .stop-content { padding-bottom: 20px; flex: 1; }
+  .stop-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+  .stop-content p { font-size: 13px; color: var(--muted); }
+  .stop-tag {
+    display: inline-block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 6px;
+  }
+
+  .day0 .stop-dot { border-color: var(--arrival); }
+  .day0 .stop-line { background: linear-gradient(var(--arrival), rgba(155,143,255,0.2)); }
+  .day1 .stop-dot { border-color: var(--day1); }
+  .day1 .stop-line { background: linear-gradient(var(--day1), rgba(74,158,255,0.2)); }
+  .day2 .stop-dot { border-color: var(--day2); }
+  .day2 .stop-line { background: linear-gradient(var(--day2), rgba(255,140,66,0.2)); }
+  .day3 .stop-dot { border-color: var(--day3); }
+  .day3 .stop-line { background: linear-gradient(var(--day3), rgba(78,203,113,0.2)); }
+
+  .stop-dot.filled { background: currentColor; }
+
+  /* ─── TAGS ─── */
+  .tag-sight { background: rgba(74,158,255,0.12); color: #7ec8ff; }
+  .tag-food { background: rgba(255,200,60,0.12); color: #ffd166; }
+  .tag-ride { background: rgba(255,140,66,0.12); color: #ffaa66; }
+  .tag-stay { background: rgba(78,203,113,0.12); color: #7de0a0; }
+  .tag-tip { background: rgba(155,143,255,0.12); color: #b8b0ff; }
+
+  /* ─── GRID CARDS ─── */
+  .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; margin-top: 16px; }
+
+  .card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+  }
+  .card h4 { font-size: 14px; font-weight: 600; margin-bottom: 6px; }
+  .card p { font-size: 13px; color: var(--muted); }
+  .card .price { font-size: 12px; color: #7de0a0; font-weight: 500; margin-top: 6px; }
+  .card .card-tag {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    display: block;
+  }
+
+  /* ─── FOOD TABLE ─── */
+  .food-item {
+    display: flex;
+    gap: 14px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .food-item:last-child { border-bottom: none; }
+  .food-emoji { font-size: 24px; flex-shrink: 0; width: 36px; text-align: center; margin-top: 2px; }
+  .food-item h4 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+  .food-item p { font-size: 13px; color: var(--muted); }
+  .food-where { font-size: 11px; color: var(--accent); font-weight: 500; margin-top: 4px; }
+
+  /* ─── TIPS ─── */
+  .tips-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-top: 16px; }
+  .tip-card {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+  }
+  .tip-icon { font-size: 22px; margin-bottom: 8px; }
+  .tip-card h4 { font-size: 13px; font-weight: 600; margin-bottom: 4px; }
+  .tip-card p { font-size: 12px; color: var(--muted); }
+
+  /* ─── HIGHLIGHT BOX ─── */
+  .highlight {
+    background: rgba(255,140,66,0.07);
+    border: 1px solid rgba(255,140,66,0.25);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #ffcfa0;
+    margin-top: 14px;
+  }
+  .highlight strong { color: var(--accent); }
+
+  /* ─── ALT ROUTE ─── */
+  .alt-route {
+    background: rgba(155,143,255,0.07);
+    border: 1px solid rgba(155,143,255,0.2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    font-size: 13px;
+    color: #c8c4ff;
+    margin-top: 14px;
+  }
+  .alt-route strong { color: #b8b0ff; }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 24px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* ─── LEAFLET OVERRIDES ─── */
+  .leaflet-popup-content-wrapper {
+    background: #1e2029 !important;
+    border: 1px solid #2a2d38 !important;
+    color: #e8eaf0 !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5) !important;
+  }
+  .leaflet-popup-tip { background: #1e2029 !important; }
+  .leaflet-popup-content { margin: 12px 16px !important; font-family: 'Inter', sans-serif !important; font-size: 13px !important; }
+  .leaflet-popup-content b { color: #ff8c42; font-size: 14px; display: block; margin-bottom: 4px; }
+  .leaflet-popup-content small { color: #8b8fa8; display: block; margin-top: 4px; }
+  .leaflet-tile { filter: brightness(0.85) saturate(0.7); }
+
+  @media (max-width: 600px) {
+    .hero { padding: 36px 16px 28px; }
+    #map { height: 320px; }
+    .day-header { padding: 16px; }
+    .day-body { padding: 0 16px 20px; }
+    .content { padding: 0 16px 48px; }
+    .day-meta { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<header class="hero">
+  <div class="hero-badge">🏍 Royal Enfield Himalayan · April 2026</div>
+  <h1>Mumbai → <span>Lonavala</span> → Kolad<br>3-Day Ghat Circuit</h1>
+  <p>Viewpoints, ancient caves, ghat descents, and a riverside night in the Konkan — all within 400km of Mumbai.</p>
+  <div class="stats-row">
+    <div class="stat-pill"><strong>3</strong><span>Ride Days</span></div>
+    <div class="stat-pill"><strong>~390 km</strong><span>Total Loop</span></div>
+    <div class="stat-pill"><strong>2</strong><span>Overnight Stops</span></div>
+    <div class="stat-pill"><strong>1</strong><span>Night Away</span></div>
+    <div class="stat-pill"><strong>NH48 + Ghats</strong><span>Road Mix</span></div>
+  </div>
+</header>
+
+<!-- ═══════════════════ MAP ═══════════════════ -->
+<section class="map-section">
+  <div class="map-header">
+    <h2>Ride Map</h2>
+    <p>Click any marker for details. Use scroll or pinch to zoom.</p>
+  </div>
+  <div class="map-legend" style="max-width:960px; margin:0 auto; padding:0 24px 14px;">
+    <div class="legend-item"><div class="legend-line" style="background:#9b8fff; opacity:0.7; height:2px; border-top: 2px dashed #9b8fff; background:none;"></div> Tonight's arrival</div>
+    <div class="legend-item"><div class="legend-line" style="background:#4a9eff;"></div> Day 1 — Lonavala loop</div>
+    <div class="legend-item"><div class="legend-line" style="background:#ff8c42;"></div> Day 2 — Lonavala → Kolad</div>
+    <div class="legend-item"><div class="legend-line" style="background:#4ecb71;"></div> Day 3 — Kolad → Mumbai</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#ff8c42;"></div> Key stop</div>
+  </div>
+  <div id="map"></div>
+</section>
+
+<!-- ═══════════════════ ITINERARY ═══════════════════ -->
+<main class="content">
+  <h2 class="section-title">Day-by-Day <span>Itinerary</span></h2>
+
+  <!-- ─── NIGHT 0 ─── -->
+  <div class="day-card day0">
+    <div class="day-header">
+      <div class="day-badge">Tonight</div>
+      <div class="day-header-text">
+        <h3>Mumbai → Lonavala</h3>
+        <p>Arrival night — check in, rest up</p>
+      </div>
+      <div class="day-meta">
+        <strong>~95 km</strong>
+        NH48 Expressway
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="route-stops">
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#9b8fff; background:#9b8fff;"></div><div class="stop-line" style="background:linear-gradient(#9b8fff, rgba(155,143,255,0.2));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Depart</span>
+            <h4>Mumbai (Western Suburbs)</h4>
+            <p>Take the Mumbai–Pune Expressway (NH48) — smooth 6-lane highway, well-lit at night. Expect a fuel stop at Khalapur or the Expressway service plaza. Toll booths are FASTag-enabled.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#9b8fff; background:#9b8fff;"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-stay">Arrive</span>
+            <h4>Lonavala</h4>
+            <p>~1.5 hrs from Mumbai at a steady pace. Check in, grab a hot cup of chai on the main market road. The town quiets down by 10pm so settle in early.</p>
+          </div>
+        </div>
+      </div>
+      <div class="highlight"><strong>Night tip:</strong> Avoid the old Mumbai–Pune highway (via Khandala) at night — twisty, poor lighting. Stick to the Expressway tonight.</div>
+    </div>
+  </div>
+
+  <!-- ─── DAY 1 ─── -->
+  <div class="day-card day1">
+    <div class="day-header">
+      <div class="day-badge">Day 1</div>
+      <div class="day-header-text">
+        <h3>Lonavala Base Day — Viewpoints & Caves</h3>
+        <p>A relaxed loop of the plateau's greatest hits</p>
+      </div>
+      <div class="day-meta">
+        <strong>~75 km</strong>
+        Loop · Stay: Lonavala
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="route-stops">
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Morning Start</span>
+            <h4>Lonavala → Duke's Nose</h4>
+            <p>Ride east on the old Mumbai–Pune highway (NH48 old alignment). Duke's Nose is a short 1km trail from the road — a dramatic rocky outcrop with sheer drops and sweeping Khopoli valley views. Best at sunrise. <strong>15 min ride.</strong></p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-sight">Viewpoint</span>
+            <h4>Tiger's Leap (Waghdari)</h4>
+            <p>A 650m sheer cliff shaped like a leaping tiger. One of the most dramatic viewpoints in the Sahyadris. The Himalayan parks easily here. <strong>5 min from Duke's Nose.</strong></p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-sight">Viewpoint</span>
+            <h4>Lion's Point & Sunset Point</h4>
+            <p>Sweeping 180° views of three valleys converging. The road up is lined with corn and bhutta vendors. Arrive before 9am to beat tour groups.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-food">Brunch Stop</span>
+            <h4>Bhushi Dam Area</h4>
+            <p>Return to Lonavala for breakfast at one of the dhabas near Bhushi Dam. Try <em>misal pav</em> and chai. The dam itself is a classic stop — though it's best during monsoon, the area is scenic year-round.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-sight">Heritage</span>
+            <h4>Karla Caves</h4>
+            <p>Ride east ~15km on the old highway. The <em>Chaitya Griha</em> at Karla is the largest rock-cut Buddhist prayer hall in India — over 2,000 years old. The Himalayan fits in the small parking area. ₹40 entry.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-sight">Heritage</span>
+            <h4>Bhaja Caves</h4>
+            <p>3km from Karla, slightly off the road. 22 rock-cut caves from the 2nd century BC with a beautiful carved chaitya and a waterfall nearby. Far less crowded than Karla.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div><div class="stop-line" style="background:linear-gradient(#4a9eff, rgba(74,158,255,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-sight">Optional</span>
+            <h4>Lohagad Fort (if energy permits)</h4>
+            <p>A 20-minute ride from Bhaja, then a 45-min hike up to a perfectly preserved hill fort with stunning valley views. The dirt road to the base trailhead is ideal Himalayan territory. Skip if tired — save legs for Day 2.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4a9eff; background:#4a9eff;"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-stay">Evening</span>
+            <h4>Back to Lonavala — Market Walk</h4>
+            <p>Hit the main bazaar for <strong>chikki</strong> and <strong>fudge</strong> (Lonavala's two great exports). Cooper's and Maganlal are the gold-standard shops. Get back before dark and pick up supplies for the next day's longer ride.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DAY 2 ─── -->
+  <div class="day-card day2">
+    <div class="day-header">
+      <div class="day-badge">Day 2</div>
+      <div class="day-header-text">
+        <h3>The Ghat Descent — Lonavala to Kolad</h3>
+        <p>Down the Borghat, through the Konkan to the river</p>
+      </div>
+      <div class="day-meta">
+        <strong>~120 km</strong>
+        Ghats + Konkan · Stay: Kolad
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="route-stops">
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#ff8c42; background:#ff8c42;"></div><div class="stop-line" style="background:linear-gradient(#ff8c42, rgba(255,140,66,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Morning</span>
+            <h4>Lonavala → Khandala → Borghat Descent</h4>
+            <p>Take the <strong>old Mumbai–Pune highway</strong> down the Borghat (not the Expressway). This is the classic British-era switchback road — tight hairpins, dramatic valley views on every bend. The Himalayan was made for this. Take it slowly; trucks share the road.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#ff8c42; background:#ff8c42;"></div><div class="stop-line" style="background:linear-gradient(#ff8c42, rgba(255,140,66,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Descent</span>
+            <h4>Khopoli — Base of the Ghats</h4>
+            <p>At the foot of the ghats, the landscape shifts suddenly to flat Konkan. Fuel up here — next good fuel point is Kolad. Take the NH66 south (the old coastal highway).</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#ff8c42; background:#ff8c42;"></div><div class="stop-line" style="background:linear-gradient(#ff8c42, rgba(255,140,66,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Konkan Run</span>
+            <h4>NH66 South → Pen → Nagothane</h4>
+            <p>Smooth, fast road through mango orchards, rice paddies, and Konkan villages. The air quality shifts noticeably — cooler, humid, more fragrant. Look out for the Patalganga river crossing near Khopoli.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#ff8c42; background:#ff8c42;"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-stay">Arrive ~Noon</span>
+            <h4>Kolad — Riverside Camp</h4>
+            <p>Kolad sits on the Kundalika River and is Maharashtra's best-known white-water rafting base. Check in early, freshen up, then book an afternoon <strong>rafting session</strong> (Grade 3–4, ~₹800–1,200 per head) — the adrenaline pairs well with a day of riding. Evening is quiet around the river with fireflies after dark.</p>
+          </div>
+        </div>
+      </div>
+      <div class="alt-route">
+        <strong>Alternative scenic route (add 40km):</strong> From Lonavala, head south via the Expressway to Pune, then west through Paud and down the <strong>Tamhini Ghat</strong> to Kolad. Tamhini is arguably Maharashtra's most beautiful ghat road — narrow, canopied, with waterfalls running across the tarmac in season. Adds 1.5 hrs but is unforgettable.
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── DAY 3 ─── -->
+  <div class="day-card day3">
+    <div class="day-header">
+      <div class="day-badge">Day 3</div>
+      <div class="day-header-text">
+        <h3>River to Expressway — Kolad → Mumbai</h3>
+        <p>Easy return via coastal highway and the expressway</p>
+      </div>
+      <div class="day-meta">
+        <strong>~195 km</strong>
+        NH66 + NH48
+      </div>
+    </div>
+    <div class="day-body">
+      <div class="route-stops">
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4ecb71; background:#4ecb71;"></div><div class="stop-line" style="background:linear-gradient(#4ecb71, rgba(78,203,113,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Morning</span>
+            <h4>Kolad → Nagothane → Pen</h4>
+            <p>Depart by 8am. Retrace north on NH66 — the morning light on the Konkan plains is lovely. Stop for <em>vada pav</em> and chai at a roadside stall in Pen or Nagothane.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4ecb71; background:#4ecb71;"></div><div class="stop-line" style="background:linear-gradient(#4ecb71, rgba(78,203,113,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Optional Detour</span>
+            <h4>Khopoli → Rajmachi Village (Dirt Road)</h4>
+            <p>If you're up for it: from Khopoli, a 22km <strong>off-road trail</strong> leads up to Rajmachi village at the base of Rajmachi Fort — proper Himalayan terrain (rocky, forested, stream crossings). Return to Khopoli after, then join the Expressway. Allow 2 hrs extra.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4ecb71; background:#4ecb71;"></div><div class="stop-line" style="background:linear-gradient(#4ecb71, rgba(78,203,113,0.3));"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-ride">Highway</span>
+            <h4>Khopoli → Mumbai-Pune Expressway → Mumbai</h4>
+            <p>Join the Expressway at Khalapur and cruise back to Mumbai. The Himalayan is comfortable at 90–100 km/h. Aim to reach Mumbai before midday to avoid evening traffic.</p>
+          </div>
+        </div>
+        <div class="stop">
+          <div class="stop-left"><div class="stop-dot filled" style="border-color:#4ecb71; background:#4ecb71;"></div></div>
+          <div class="stop-content">
+            <span class="stop-tag tag-food">Final Meal</span>
+            <h4>Khopoli / Khalapur — Dhaba Lunch</h4>
+            <p>Several excellent highway dhabas at the Khopoli exit serve <em>thali</em> and fresh Konkan seafood curries. A fitting end before the city swallows you.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ STAYS ═══════════════════ -->
+  <h2 class="section-title">Where to <span>Stay</span></h2>
+
+  <p style="color:var(--muted); font-size:13px; margin-bottom:4px;">LONAVALA — Nights 0 &amp; 1</p>
+  <div class="grid-3">
+    <div class="card">
+      <span class="card-tag" style="color:#4ecb71;">Budget · ₹1,500–2,800</span>
+      <h4>Hotel Adarsh / Hotel Chandralok</h4>
+      <p>Clean, central, no-frills rooms on the main bazaar road. Motorbike parking on the street outside. Good for an early-morning departure.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="color:#ffd166;">Mid-range · ₹4,500–8,000</span>
+      <h4>Fariyas Resort</h4>
+      <p>Well-maintained resort with a pool, restaurant and covered bike parking. Walking distance from the market. Reliable WiFi for route planning.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="color:#ff8c42;">Splurge · ₹12,000–20,000</span>
+      <h4>The Machan</h4>
+      <p>Stilted treehouse eco-resort in the forest canopy above Lonavala. Utterly unique — no TVs, no roads audible. Book the Canopy Machan well in advance.</p>
+    </div>
+  </div>
+
+  <p style="color:var(--muted); font-size:13px; margin-top:24px; margin-bottom:4px;">KOLAD — Night 2</p>
+  <div class="grid-3">
+    <div class="card">
+      <span class="card-tag" style="color:#4ecb71;">Camp · ₹1,800–3,000</span>
+      <h4>Kundalika River Camp / Nirvana Adventures</h4>
+      <p>Riverside tent camps with bonfires, rafting packages included in some deals. Basic but atmospheric — stars are spectacular this far from the city.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="color:#ffd166;">Mid · ₹3,500–6,000</span>
+      <h4>River Retreat Heritage Resort</h4>
+      <p>The most comfortable option in Kolad — proper beds, a veranda over the river, and decent food. Secure bike parking. Book 2 days ahead on weekends.</p>
+    </div>
+    <div class="card">
+      <span class="card-tag" style="color:#7ec8ff;">Alternative</span>
+      <h4>Atali Ganga (Aamby)</h4>
+      <p>Slightly further north near Khopoli, but upscale glamping tents on the riverside. Good if the Kolad camps are full on a holiday weekend.</p>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ FOOD ═══════════════════ -->
+  <h2 class="section-title">What to <span>Eat</span></h2>
+
+  <div class="food-item">
+    <div class="food-emoji">🍬</div>
+    <div>
+      <h4>Chikki & Fudge</h4>
+      <p>Lonavala's most famous exports — brittle peanut or cashew candy (chikki) and dense milk fudge. Non-negotiable purchase.</p>
+      <div class="food-where">Cooper's Chikki · Maganlal Chikki · Lonavala Fudge Centre — all on the main bazaar</div>
+    </div>
+  </div>
+  <div class="food-item">
+    <div class="food-emoji">🌽</div>
+    <div>
+      <h4>Bhutta (Roasted Corn)</h4>
+      <p>Charcoal-roasted corn rubbed with lime and chilli — a Sahyadri staple sold at every viewpoint, especially Lion's Point.</p>
+      <div class="food-where">Lion's Point · Tiger's Leap · Bhushi Dam vendors</div>
+    </div>
+  </div>
+  <div class="food-item">
+    <div class="food-emoji">🍛</div>
+    <div>
+      <h4>Misal Pav</h4>
+      <p>Spicy sprouted bean curry with a pav roll — the quintessential Maharashtra breakfast. Lonavala's dhabas do excellent versions.</p>
+      <div class="food-where">Hotel Shreeji (Lonavala) · Any dhaba near Bhushi Dam</div>
+    </div>
+  </div>
+  <div class="food-item">
+    <div class="food-emoji">🫙</div>
+    <div>
+      <h4>Vada Pav & Chai</h4>
+      <p>Maharashtra's greatest roadside meal. The journey from Khopoli to Kolad is lined with outstanding vada pav stalls.</p>
+      <div class="food-where">NH66 roadside stalls · Pen · Nagothane market</div>
+    </div>
+  </div>
+  <div class="food-item">
+    <div class="food-emoji">🦀</div>
+    <div>
+      <h4>Konkan Seafood Thali</h4>
+      <p>Once you're in the Konkan (post-ghat descent), fresh pomfret, surmai, and crab curries with kokum sol kadhi are abundant and excellent.</p>
+      <div class="food-where">Dhabas in Pen or Nagothane · Kolad market eateries</div>
+    </div>
+  </div>
+  <div class="food-item">
+    <div class="food-emoji">☕</div>
+    <div>
+      <h4>Cutting Chai at Sunrise</h4>
+      <p>Every ghat viewpoint has a chai vendor by 6:30am. The combination of a hot glass of cutting chai with a valley full of morning mist is genuinely unbeatable.</p>
+      <div class="food-where">Duke's Nose trailhead · Khandala viewpoints · Tamhini Ghat top</div>
+    </div>
+  </div>
+
+  <!-- ═══════════════════ RE HIMALAYAN TIPS ═══════════════════ -->
+  <h2 class="section-title">RE Himalayan <span>Tips</span></h2>
+  <div class="tips-grid">
+    <div class="tip-card">
+      <div class="tip-icon">⛽</div>
+      <h4>Fuel Stops</h4>
+      <p>Fill up in Lonavala, Khopoli, and Pen. Kolad has one petrol station — verify it's open before arriving. The Himalayan's 15L tank gives ~300km range so anxiety is unnecessary.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🔧</div>
+      <h4>Tyre Pressure</h4>
+      <p>Run slightly lower pressure (28–30 PSI) on the ghat roads and Rajmachi off-road. Bump back up to 32–34 PSI for the Expressway return.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🌧️</div>
+      <h4>April Weather</h4>
+      <p>Pre-monsoon heat. Mornings are pleasant (22–26°C), afternoons can be hot (32–36°C). Ride early, break midday. Light rain showers possible by afternoon — pack a rain layer.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🪨</div>
+      <h4>Road Conditions</h4>
+      <p>Old highway and ghat sections have potholes and sand patches. NH48 and NH66 are excellent. Borghat descent: watch for trucks, fallen rocks, and damp patches in shadow.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">📍</div>
+      <h4>Navigation</h4>
+      <p>Download Google Maps offline for the Lonavala region before leaving. Cell signal is patchy inside the ghats and near Rajmachi. Karla and Bhaja are well-signposted.</p>
+    </div>
+    <div class="tip-card">
+      <div class="tip-icon">🎒</div>
+      <h4>Packing</h4>
+      <p>Saddle bags or a tank bag suit the Himalayan well. Pack: rain cover, basic tools, first aid kit, water (2L), sunscreen, and a fleece for cool ghat mornings.</p>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  Lonavala 3-Day Ghat Circuit · Royal Enfield Himalayan · April 2026 · Plan your own route responsibly.
+</footer>
+
+<!-- ═══════════════════ LEAFLET MAP ═══════════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+// ─── Map Init ───
+const map = L.map('map', {
+  center: [18.85, 73.25],
+  zoom: 10,
+  zoomControl: true
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+  attribution: '© OpenStreetMap contributors',
+  maxZoom: 18
+}).addTo(map);
+
+// ─── Custom Marker Icon ───
+function makeIcon(color, label) {
+  return L.divIcon({
+    html: `<div style="background:${color};width:32px;height:32px;border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,0.3);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;">
+             <span style="transform:rotate(45deg);font-size:12px;font-weight:700;color:white;font-family:Inter,sans-serif;">${label}</span>
+           </div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -36],
+    className: ''
+  });
+}
+
+function makeSmallDot(color) {
+  return L.divIcon({
+    html: `<div style="background:${color};width:14px;height:14px;border-radius:50%;border:2px solid rgba(255,255,255,0.4);box-shadow:0 1px 4px rgba(0,0,0,0.5);"></div>`,
+    iconSize: [14, 14],
+    iconAnchor: [7, 7],
+    popupAnchor: [0, -12],
+    className: ''
+  });
+}
+
+// ─── Key Locations ───
+const places = {
+  mumbai:     [19.076, 72.877],
+  khalapur:   [18.813, 73.245],
+  lonavala:   [18.748, 73.407],
+  khandala:   [18.771, 73.387],
+  dukeNose:   [18.775, 73.401],
+  tigersLeap: [18.768, 73.402],
+  lionsPoint: [18.762, 73.399],
+  bhushiDam:  [18.757, 73.414],
+  karla:      [18.781, 73.465],
+  bhaja:      [18.765, 73.489],
+  lohagad:    [18.742, 73.478],
+  khopoli:    [18.790, 73.241],
+  pen:        [18.736, 73.097],
+  nagothane:  [18.553, 73.153],
+  kolad:      [18.531, 73.192]
+};
+
+// ─── Routes ───
+// Arrival (tonight) - dashed purple
+const arrivalRoute = L.polyline(
+  [places.mumbai, places.khalapur, places.lonavala],
+  { color: '#9b8fff', weight: 3, opacity: 0.7, dashArray: '8 6' }
+).addTo(map);
+
+// Day 1 loop - blue
+const day1Route = L.polyline(
+  [places.lonavala, places.khandala, places.dukeNose, places.tigersLeap, places.lionsPoint,
+   places.bhushiDam, places.karla, places.bhaja, places.lohagad, places.lonavala],
+  { color: '#4a9eff', weight: 3, opacity: 0.85 }
+).addTo(map);
+
+// Day 2 - orange
+const day2Route = L.polyline(
+  [places.lonavala, places.khandala, places.khopoli, places.pen, places.nagothane, places.kolad],
+  { color: '#ff8c42', weight: 3, opacity: 0.85 }
+).addTo(map);
+
+// Day 3 return - green
+const day3Route = L.polyline(
+  [places.kolad, places.nagothane, places.pen, places.khopoli, places.khalapur, places.mumbai],
+  { color: '#4ecb71', weight: 3, opacity: 0.75, dashArray: '12 5' }
+).addTo(map);
+
+// ─── Main Markers ───
+L.marker(places.mumbai, { icon: makeIcon('#9b8fff', 'MUM') })
+  .addTo(map)
+  .bindPopup('<b>Mumbai</b>Tonight\'s departure point<small>~95km to Lonavala via NH48</small>');
+
+L.marker(places.lonavala, { icon: makeIcon('#4a9eff', 'LON') })
+  .addTo(map)
+  .bindPopup('<b>Lonavala</b>Base camp — Nights 0 & 1<small>Chikki, fudge, viewpoints & caves</small>');
+
+L.marker(places.kolad, { icon: makeIcon('#ff8c42', 'KOL') })
+  .addTo(map)
+  .bindPopup('<b>Kolad</b>Night 2 — Overnight on the Kundalika River<small>Rafting, riverside camps, Konkan food</small>');
+
+// ─── Day 1 Stops ───
+L.marker(places.dukeNose, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup("<b>Duke's Nose</b>Sheer cliff viewpoint<small>Day 1 morning — 1km walk from road</small>");
+
+L.marker(places.tigersLeap, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup('<b>Tiger\'s Leap</b>650m cliff viewpoint<small>Day 1 morning</small>');
+
+L.marker(places.lionsPoint, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup('<b>Lion\'s Point</b>180° valley views<small>Day 1 morning — corn & chai vendors</small>');
+
+L.marker(places.bhushiDam, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup('<b>Bhushi Dam</b>Scenic dam & brunch stop<small>Day 1 — misal pav nearby</small>');
+
+L.marker(places.karla, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup('<b>Karla Caves</b>2,000-year-old Buddhist chaitya<small>Day 1 afternoon — ₹40 entry</small>');
+
+L.marker(places.bhaja, { icon: makeSmallDot('#4a9eff') })
+  .addTo(map).bindPopup('<b>Bhaja Caves</b>22 rock-cut Buddhist caves<small>Day 1 afternoon — less crowded than Karla</small>');
+
+L.marker(places.lohagad, { icon: makeSmallDot('#7ec8ff') })
+  .addTo(map).bindPopup('<b>Lohagad Fort</b>Optional hill fort hike<small>Day 1 late afternoon — 45min climb</small>');
+
+// ─── Day 2 Stops ───
+L.marker(places.khandala, { icon: makeSmallDot('#ff8c42') })
+  .addTo(map).bindPopup('<b>Khandala</b>Start of Borghat descent<small>Day 2 — old highway switchbacks</small>');
+
+L.marker(places.khopoli, { icon: makeSmallDot('#ff8c42') })
+  .addTo(map).bindPopup('<b>Khopoli</b>Base of the ghats — fuel up here<small>Day 2 — join NH66 south</small>');
+
+L.marker(places.pen, { icon: makeSmallDot('#ff8c42') })
+  .addTo(map).bindPopup('<b>Pen</b>Konkan vada pav stop<small>Day 2 en route to Kolad</small>');
+
+// ─── Fit map ───
+const allPoints = [
+  places.mumbai, places.kolad, places.lohagad, places.lionsPoint,
+  places.nagothane, places.karla
+];
+map.fitBounds(allPoints.map(p => [p[0], p[1]]), { padding: [36, 36] });
+</script>
+
+</body>
+</html>
