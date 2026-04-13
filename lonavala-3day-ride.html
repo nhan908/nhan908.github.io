@@ -365,6 +365,86 @@
   .leaflet-popup-content small { color: #8b8fa8; display: block; margin-top: 4px; }
   .leaflet-tile { filter: brightness(0.85) saturate(0.7); }
 
+  /* ─── GOOGLE MAPS SECTION ─── */
+  .gmaps-section {
+    background: var(--surface);
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 32px 0;
+  }
+  .gmaps-inner {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .gmaps-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 14px;
+  }
+  .gmap-card {
+    display: block;
+    text-decoration: none;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 18px;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+    cursor: pointer;
+  }
+  .gmap-card:hover { transform: translateY(-2px); box-shadow: 0 6px 24px rgba(0,0,0,0.4); }
+  .gmap-arrival:hover  { border-color: var(--arrival); }
+  .gmap-day1:hover     { border-color: var(--day1); }
+  .gmap-day2:hover     { border-color: var(--day2); }
+  .gmap-day2alt:hover  { border-color: rgba(255,140,66,0.5); }
+  .gmap-day3:hover     { border-color: var(--day3); }
+
+  .gmap-label {
+    font-size: 10px; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  .gmap-arrival .gmap-label  { color: var(--arrival); }
+  .gmap-day1 .gmap-label     { color: var(--day1); }
+  .gmap-day2 .gmap-label,
+  .gmap-day2alt .gmap-label  { color: var(--day2); }
+  .gmap-day3 .gmap-label     { color: var(--day3); }
+
+  .gmap-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 15px; font-weight: 700;
+    color: var(--text); margin-bottom: 10px;
+  }
+  .gmap-stops {
+    display: flex; flex-wrap: wrap;
+    align-items: center; gap: 4px;
+    margin-bottom: 12px;
+  }
+  .gmap-stops span { font-size: 12px; color: var(--muted); }
+  .gmap-stops .arr { color: #3a3d4e !important; font-size: 10px !important; }
+  .gmap-meta {
+    font-size: 12px; color: var(--muted);
+    padding-top: 10px; border-top: 1px solid var(--border);
+    margin-bottom: 14px;
+  }
+  .gmap-btn {
+    display: inline-block;
+    background: rgba(255,140,66,0.1);
+    color: var(--accent);
+    border: 1px solid rgba(255,140,66,0.25);
+    border-radius: 7px;
+    padding: 7px 14px;
+    font-size: 12px; font-weight: 600;
+  }
+  .gmap-card:hover .gmap-btn { background: rgba(255,140,66,0.2); }
+  .gmaps-notice {
+    color: var(--muted); font-size: 12px; margin-top: 16px;
+    padding: 12px 16px;
+    background: rgba(155,143,255,0.06);
+    border: 1px solid rgba(155,143,255,0.15);
+    border-radius: 8px;
+  }
+
   @media (max-width: 600px) {
     .hero { padding: 36px 16px 28px; }
     #map { height: 320px; }
@@ -372,6 +452,7 @@
     .day-body { padding: 0 16px 20px; }
     .content { padding: 0 16px 48px; }
     .day-meta { display: none; }
+    .gmaps-grid { grid-template-columns: 1fr; }
   }
 </style>
 </head>
@@ -406,6 +487,98 @@
   </div>
   <div id="map"></div>
 </section>
+
+<!-- ═══════════════════ GOOGLE MAPS ROUTES ═══════════════════ -->
+<div class="gmaps-section">
+  <div class="gmaps-inner">
+    <h2 class="section-title" style="margin-top:0; padding-top:0; border-top:none;">Navigate with <span>Google Maps</span></h2>
+    <p style="color:var(--muted); font-size:13px; margin-bottom:20px; margin-top:-10px;">Tap any card to open the full route in Google Maps — works on desktop and mobile.</p>
+    <div class="gmaps-grid">
+
+      <!-- Tonight -->
+      <a class="gmap-card gmap-arrival" href="https://www.google.com/maps/dir/Mumbai,+Maharashtra/Lonavala,+Maharashtra/" target="_blank" rel="noopener">
+        <div class="gmap-label">Tonight · Arrival</div>
+        <div class="gmap-title">Mumbai → Lonavala</div>
+        <div class="gmap-stops">
+          <span>Mumbai</span><span class="arr">→</span>
+          <span>Khalapur Toll</span><span class="arr">→</span>
+          <span>Lonavala</span>
+        </div>
+        <div class="gmap-meta">~95 km &nbsp;·&nbsp; ~1.5 hrs &nbsp;·&nbsp; NH48 Expressway all the way</div>
+        <div class="gmap-btn">Open in Google Maps ↗</div>
+      </a>
+
+      <!-- Day 1 -->
+      <a class="gmap-card gmap-day1" href="https://www.google.com/maps/dir/18.748,73.407/18.7748,73.4014/18.7675,73.402/18.7623,73.399/18.757,73.414/18.781,73.465/18.765,73.489/18.742,73.478/18.748,73.407/" target="_blank" rel="noopener">
+        <div class="gmap-label">Day 1 · Loop</div>
+        <div class="gmap-title">Lonavala Viewpoints &amp; Caves</div>
+        <div class="gmap-stops">
+          <span>Lonavala</span><span class="arr">→</span>
+          <span>Duke's Nose</span><span class="arr">→</span>
+          <span>Tiger's Leap</span><span class="arr">→</span>
+          <span>Lion's Point</span><span class="arr">→</span>
+          <span>Bhushi Dam</span><span class="arr">→</span>
+          <span>Karla Caves</span><span class="arr">→</span>
+          <span>Bhaja Caves</span><span class="arr">→</span>
+          <span>Lohagad Fort</span><span class="arr">→</span>
+          <span>Lonavala</span>
+        </div>
+        <div class="gmap-meta">~75 km loop &nbsp;·&nbsp; Old highway + side roads &nbsp;·&nbsp; Start by 7am</div>
+        <div class="gmap-btn">Open in Google Maps ↗</div>
+      </a>
+
+      <!-- Day 2 Direct -->
+      <a class="gmap-card gmap-day2" href="https://www.google.com/maps/dir/Lonavala,+Maharashtra/Khandala,+Maharashtra/Khopoli,+Maharashtra/Pen,+Maharashtra/Kolad,+Maharashtra/" target="_blank" rel="noopener">
+        <div class="gmap-label">Day 2 · Direct Route</div>
+        <div class="gmap-title">Lonavala → Kolad via Borghat</div>
+        <div class="gmap-stops">
+          <span>Lonavala</span><span class="arr">→</span>
+          <span>Khandala</span><span class="arr">→</span>
+          <span>Borghat Descent</span><span class="arr">→</span>
+          <span>Khopoli</span><span class="arr">→</span>
+          <span>Pen</span><span class="arr">→</span>
+          <span>Kolad</span>
+        </div>
+        <div class="gmap-meta">~120 km &nbsp;·&nbsp; Old highway + NH66 south &nbsp;·&nbsp; 3–4 hrs</div>
+        <div class="gmap-btn">Open in Google Maps ↗</div>
+      </a>
+
+      <!-- Day 2 Alt via Tamhini -->
+      <a class="gmap-card gmap-day2alt" href="https://www.google.com/maps/dir/Lonavala,+Maharashtra/Paud,+Pune,+Maharashtra/18.48,73.37/Kolad,+Maharashtra/" target="_blank" rel="noopener">
+        <div class="gmap-label">Day 2 · Scenic Alternative</div>
+        <div class="gmap-title">Lonavala → Kolad via Tamhini Ghat</div>
+        <div class="gmap-stops">
+          <span>Lonavala</span><span class="arr">→</span>
+          <span>Paud</span><span class="arr">→</span>
+          <span>Tamhini Ghat Pass</span><span class="arr">→</span>
+          <span>Kolad</span>
+        </div>
+        <div class="gmap-meta">~160 km &nbsp;·&nbsp; +40km vs direct &nbsp;·&nbsp; Maharashtra's most scenic ghat road</div>
+        <div class="gmap-btn">Open in Google Maps ↗</div>
+      </a>
+
+      <!-- Day 3 -->
+      <a class="gmap-card gmap-day3" href="https://www.google.com/maps/dir/Kolad,+Maharashtra/Nagothane,+Maharashtra/Pen,+Maharashtra/Khopoli,+Maharashtra/Mumbai,+Maharashtra/" target="_blank" rel="noopener">
+        <div class="gmap-label">Day 3 · Return</div>
+        <div class="gmap-title">Kolad → Mumbai</div>
+        <div class="gmap-stops">
+          <span>Kolad</span><span class="arr">→</span>
+          <span>Nagothane</span><span class="arr">→</span>
+          <span>Pen</span><span class="arr">→</span>
+          <span>Khopoli</span><span class="arr">→</span>
+          <span>NH48 Expressway</span><span class="arr">→</span>
+          <span>Mumbai</span>
+        </div>
+        <div class="gmap-meta">~195 km &nbsp;·&nbsp; NH66 + NH48 &nbsp;·&nbsp; Depart by 8am to avoid heat</div>
+        <div class="gmap-btn">Open in Google Maps ↗</div>
+      </a>
+
+    </div>
+    <div class="gmaps-notice">
+      📵 &nbsp;<strong>Download offline maps</strong> before leaving — save the Lonavala, Raigad, and Mumbai districts in Google Maps. Signal is patchy on the Borghat, non-existent on the Rajmachi trail.
+    </div>
+  </div>
+</div>
 
 <!-- ═══════════════════ ITINERARY ═══════════════════ -->
 <main class="content">
